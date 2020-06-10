@@ -7,15 +7,13 @@ export default class IngredientValidator {
   public schema = schema.create({
     title: schema.string({}, [
       rules.unique({
-        table: 'ingredients', 
-        column: 'title', 
+        table: 'ingredients',
+        column: 'title',
         whereNot: this.ctx.params.id ? {id: this.ctx.params.id} : undefined
       })
     ]),
     unit: schema.string.optional({}, [])
   });
-
-  public cacheKey = this.ctx.routeKey
 
   public messages = {}
 }

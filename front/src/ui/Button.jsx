@@ -1,6 +1,6 @@
 import React from 'react'
 
-export function Button ({loading, ...buttonProps}) {
+export function Button ({loading, className = '', type = 'primary', ...buttonProps}) {
   if (loading) {
     buttonProps.children = <>
       <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"/> Chargement...
@@ -8,5 +8,5 @@ export function Button ({loading, ...buttonProps}) {
     buttonProps.disabled = true
   }
 
- return <button className="btn btn-primary" {...buttonProps}></button>
+ return <button className={`btn btn-${type} ${className}`} {...buttonProps}></button>
 }

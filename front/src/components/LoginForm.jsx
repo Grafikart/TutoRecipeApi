@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
-import {Button} from './ui/Button'
-import {API_URL} from './config'
-import {AlertErrors} from './ui/Alert'
+import {Button} from '../ui/Button'
+import {API_URL} from '../config'
+import {AlertErrors} from '../ui/Alert'
 
 export function LoginForm ({onSuccess}) {
   const [loading, setLoading] = useState(false)

@@ -7,8 +7,8 @@ export default class RecipeValidator {
   public schema = schema.create({
     title: schema.string({}, [
       rules.unique({
-        table: 'recipes', 
-        column: 'title', 
+        table: 'recipes',
+        column: 'title',
         whereNot: this.ctx.params.id ? {id: this.ctx.params.id} : undefined
       })
     ]),
@@ -20,8 +20,6 @@ export default class RecipeValidator {
       })
     )
   });
-
-  public cacheKey = this.ctx.routeKey
 
   public messages = {}
 }

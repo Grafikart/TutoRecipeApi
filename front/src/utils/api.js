@@ -20,3 +20,11 @@ export async function apiFetch (endpoint, options) {
     throw responseData
   }
 }
+
+/**
+ * @param {HTMLFormElement} element
+ * @return {string}
+ */
+export function formToJson(element) {
+  return JSON.stringify(Object.fromEntries(new FormData(element)))
+}
