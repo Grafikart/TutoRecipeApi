@@ -8,5 +8,10 @@ export function Button ({loading, className = '', type = 'primary', ...buttonPro
     buttonProps.disabled = true
   }
 
+  if (type === 'submit') {
+    type = 'primary'
+    buttonProps = {type: 'submit', ...buttonProps}
+  }
+
  return <button className={`btn btn-${type} ${className}`} {...buttonProps}></button>
 }

@@ -29,6 +29,5 @@ export function Ingredients () {
         <IngredientCreate onCreate={handleCreate}/>
       </div>
     }
-    {JSON.stringify(ingredients)}
   </div>
 }
