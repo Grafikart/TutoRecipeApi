@@ -1,8 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import {LoginForm} from './components/LoginForm'
-import {Ingredients} from './components/Ingredients'
 import {apiFetch} from './utils/api'
-import {RecipeCreate} from './components/recipes/RecipeCreate'
+import {Site} from './components/Site'
 
 function App() {
   const [user, setUser] = useState(null)
@@ -23,12 +22,7 @@ function App() {
   }
 
   return (
-    <div className="container mt-4">
-      {user ? <>
-        <RecipeCreate />
-        <Ingredients />
-      </> : <LoginForm onSuccess={setUser}/>}
-    </div>
+      user ? <Site /> : <LoginForm onSuccess={setUser}/>
   );
 }
 

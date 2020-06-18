@@ -19,7 +19,7 @@ export const Fetch = function ({endpoint, children, ...props}) {
   return children({data, ...props})
 }
 
-export const RecipeCreate = function () {
+export const RecipeCreate = function ({onSubmit}) {
 
   const form = useRef(null)
   const {loading, errors, data, doFetch} = useApiFetch()
@@ -28,14 +28,44 @@ export const RecipeCreate = function () {
     doFetch('/recipes', {
       method: 'post',
       body: JSON.stringify(data)
-    }).then(() => {
+    }).then(data => {
       form.current.reset()
+      if (onSubmit) {
+        onSubmit(data)
+      }
     })
   }
 
   return <Fetch endpoint="/ingredients">
-    {({data: ingredients}) => <RecipeCreateForm
+    {({data: ingredients}) => <RecipeForm
       ref={form}
+      ingredients={ingredients}
+      onSubmit={handleSubmit}
+      errors={errors}
+      loading={loading}/>}
+  </Fetch>
+}
+
+export const RecipeEdit = function ({recipe, onSubmit}) {
+
+  const form = useRef(null)
+  const {loading, errors, data, doFetch} = useApiFetch()
+
+  const handleSubmit = async function (data) {
+    doFetch('/recipes/' + recipe.id, {
+      method: 'put',
+      body: JSON.stringify(data)
+    }).then(data => {
+      if (onSubmit) {
+        onSubmit(data)
+      }
+    })
+  }
+
+  return <Fetch endpoint="/ingredients">
+    {({data: ingredients}) => <RecipeForm
+      ref={form}
+      recipe={recipe}
       ingredients={ingredients}
       onSubmit={handleSubmit}
       errors={errors}
@@ -74,9 +104,9 @@ const RecipeIngredientRow = function ({ingredient, quantity, onChange, onDelete}
   </div>
 }
 
-const RecipeCreateForm = forwardRef(function ({ingredients, onSubmit, loading, errors}, ref) {
+const RecipeForm = forwardRef(function ({ingredients, onSubmit, loading, errors, recipe = {}}, ref) {
 
-  const [recipeIngredients, dispatch] = useReducer(ingredientsReducer, [])
+  const [recipeIngredients, dispatch] = useReducer(ingredientsReducer, recipe.ingredients || [])
 
   const handleChange = function (ingredient) {
     dispatch({type: 'ADD_INGREDIENT', ingredient})
@@ -116,8 +146,8 @@ const RecipeCreateForm = forwardRef(function ({ingredients, onSubmit, loading, e
     <h1>Créer une nouvelle recette</h1>
     <div className="row mb-2">
       <div className="col-md-6">
-        <Field name="title" error={errors.title} required>Titre</Field>
-        <Field name="content" error={errors.content} type="textarea" required>Description</Field>
+        <Field name="title" error={errors.title} defaultValue={recipe.title} required>Titre</Field>
+        <Field name="content" error={errors.content} defaultValue={recipe.content}  type="textarea" required>Description</Field>
       </div>
       <div className="col-md-6">
         <h3>Ingrédients</h3>
@@ -133,6 +163,6 @@ const RecipeCreateForm = forwardRef(function ({ingredients, onSubmit, loading, e
         </div>
       </div>
     </div>
-    <Button type="submit" loading={loading}>Créer</Button>
+    <Button type="submit" loading={loading}>Enregistrer</Button>
   </form>
 })
