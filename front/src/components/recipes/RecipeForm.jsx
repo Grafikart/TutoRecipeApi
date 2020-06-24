@@ -3,74 +3,49 @@ import {Field} from '../../ui/Field'
 import {Button} from '../../ui/Button'
 import {apiFetch} from '../../utils/api'
 import {Select} from '../ingredients/Select'
-import {useApiFetch} from '../../hooks/api'
 import {Trash} from '../../ui/Icons'
 
-export const Fetch = function ({endpoint, children, ...props}) {
-  const [data, setData] = useState(null)
-
-  useEffect(function () {
-    apiFetch(endpoint).then(setData)
-  }, [])
-
-  if (data === null) {
-    return <div>Chargement...</div>
-  }
-  return children({data, ...props})
-}
-
-export const RecipeCreate = function ({onSubmit}) {
-
+export const RecipeCreate = function ({onSubmit, ingredients}) {
+  const [errors, setErrors] = useState({})
+  const [loading, setLoading] = useState(false)
   const form = useRef(null)
-  const {loading, errors, data, doFetch} = useApiFetch()
 
-  const handleSubmit = async function (data) {
-    doFetch('/recipes', {
-      method: 'post',
-      body: JSON.stringify(data)
-    }).then(data => {
+  const handleSubmit = function (data) {
+    setLoading(true)
+    try {
+      onSubmit(data)
       form.current.reset()
-      if (onSubmit) {
-        onSubmit(data)
-      }
-    })
+    } catch (e) {
+      setErrors(e)
+    }
+    setLoading(false)
   }
 
-  return <Fetch endpoint="/ingredients">
-    {({data: ingredients}) => <RecipeForm
+  return <RecipeForm
       ref={form}
       ingredients={ingredients}
       onSubmit={handleSubmit}
       errors={errors}
-      loading={loading}/>}
-  </Fetch>
+      loading={loading}/>
 }
 
-export const RecipeEdit = function ({recipe, onSubmit}) {
+export const RecipeEdit = function ({recipe, ingredients, onSubmit}) {
 
   const form = useRef(null)
-  const {loading, errors, data, doFetch} = useApiFetch()
 
   const handleSubmit = async function (data) {
-    doFetch('/recipes/' + recipe.id, {
+    onSubmit(data)
+    apiFetch('/recipes/' + recipe.id, {
       method: 'put',
       body: JSON.stringify(data)
-    }).then(data => {
-      if (onSubmit) {
-        onSubmit(data)
-      }
     })
   }
 
-  return <Fetch endpoint="/ingredients">
-    {({data: ingredients}) => <RecipeForm
+  return <RecipeForm
       ref={form}
       recipe={recipe}
       ingredients={ingredients}
-      onSubmit={handleSubmit}
-      errors={errors}
-      loading={loading}/>}
-  </Fetch>
+      onSubmit={handleSubmit}/>
 }
 
 function ingredientsReducer (state, action) {
@@ -78,25 +53,25 @@ function ingredientsReducer (state, action) {
     case 'RESET':
       return []
     case 'ADD_INGREDIENT':
-      return [...state, {ingredient: action.ingredient, quantity: 0}]
+      return [...state, {
+        id: action.payload.id,
+        quantity: 0,
+        title: action.payload.title,
+        unit: action.payload.unit
+      }]
     case 'UPDATE_QUANTITY':
-      return state.map(i => {
-        if (i.ingredient === action.ingredient) {
-          return {ingredient: action.ingredient, quantity: parseFloat(action.quantity)}
-        }
-        return i
-      })
+      return state.map(i => i === action.target ? {...i, quantity: action.payload} : i)
     case 'REMOVE_INGREDIENT':
-      return state.filter(i => i.ingredient !== action.ingredient)
+      return state.filter(i => i !== action.payload)
     default:
       return state
   }
 }
 
-const RecipeIngredientRow = function ({ingredient, quantity, onChange, onDelete}) {
+const RecipeIngredientRow = function ({ingredient, onChange, onDelete}) {
   return <div className="d-flex align-items-center mb-3">
     <div className="mr-2">{ingredient.title}</div>
-    <Field className="mb-0" defaultValue={quantity} placeholder="quantité" onChange={e => onChange(ingredient, e.target.value)} required/>
+    <Field className="mb-0" defaultValue={ingredient.quantity} placeholder="quantité" onChange={e => onChange(ingredient, e.target.value)} required/>
     <div className="ml-2">{ingredient.unit}</div>
     <Button className="ml-2" type="danger" onClick={e => onDelete(ingredient)}>
       <Trash/>
@@ -104,29 +79,26 @@ const RecipeIngredientRow = function ({ingredient, quantity, onChange, onDelete}
   </div>
 }
 
-const RecipeForm = forwardRef(function ({ingredients, onSubmit, loading, errors, recipe = {}}, ref) {
+const RecipeForm = forwardRef(function ({ingredients, onSubmit, loading, errors = {}, recipe = {}}, ref) {
 
   const [recipeIngredients, dispatch] = useReducer(ingredientsReducer, recipe.ingredients || [])
 
   const handleChange = function (ingredient) {
-    dispatch({type: 'ADD_INGREDIENT', ingredient})
+    dispatch({type: 'ADD_INGREDIENT', payload: ingredient})
   }
 
   const handleChangeQuantity = function (ingredient, quantity) {
     dispatch({
       type: 'UPDATE_QUANTITY',
-      ingredient,
-      quantity
+      target: ingredient,
+      payload: quantity
     })
   }
 
   const handleSubmit = function (e) {
     e.preventDefault()
     const data = Object.fromEntries(new FormData(e.target))
-    data.ingredients = recipeIngredients.reduce((acc, i) => {
-      acc.push({id: i.ingredient.id, quantity: i.quantity})
-      return acc
-    }, [])
+    data.ingredients = recipeIngredients
     onSubmit(data)
   }
 
@@ -135,11 +107,11 @@ const RecipeForm = forwardRef(function ({ingredients, onSubmit, loading, errors,
   }
 
   const handleDeleteIngredient = function (ingredient) {
-    dispatch({type: 'REMOVE_INGREDIENT', ingredient})
+    dispatch({type: 'REMOVE_INGREDIENT', payload: ingredient})
   }
 
-  const filteredIngredients = ingredients.filter(ingredient => {
-    return !recipeIngredients.some(i => i.ingredient === ingredient)
+  const filteredIngredients = (ingredients || []).filter(ingredient => {
+    return !recipeIngredients.some(i => i.id === ingredient.id)
   })
 
   return <form className="mb-5" onSubmit={handleSubmit} ref={ref} onReset={handleReset}>
@@ -152,9 +124,8 @@ const RecipeForm = forwardRef(function ({ingredients, onSubmit, loading, errors,
       <div className="col-md-6">
         <h3>Ingrédients</h3>
         {recipeIngredients.map(i => <RecipeIngredientRow
-          key={i.ingredient.id}
-          ingredient={i.ingredient}
-          quantity={i.quantity}
+          key={i.id}
+          ingredient={i}
           onChange={handleChangeQuantity}
           onDelete={handleDeleteIngredient}
         />)}

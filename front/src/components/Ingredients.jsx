@@ -1,32 +1,16 @@
-import React, {useEffect} from 'react'
+import React from 'react'
 import {IngredientRow} from './ingredients/IngredientRow'
-import {useApiFetch} from '../hooks/api'
 import {IngredientCreate} from './ingredients/IngredientCreate'
 
-export function Ingredients () {
-
-  const {loading, data: ingredients, doFetch, setData: setIngredients} = useApiFetch()
-  useEffect(function () {
-    doFetch('/ingredients')
-  }, [])
-
-  const handleUpdate = function (ingredient, newIngredient) {
-    setIngredients(ingredients.map(i => i === ingredient ? newIngredient : i))
-  }
-  const handleDelete = function (ingredient) {
-    setIngredients(ingredients.filter(i => i !== ingredient))
-  }
-  const handleCreate = function (ingredient) {
-    setIngredients([...ingredients, ingredient])
-  }
+export function Ingredients ({ingredients, onUpdate, onCreate, onDelete}) {
 
   return <div>
     <h2>Gérer les ingrédients</h2>
-    {loading ?
+    {ingredients === null ?
       <div>Chargement...</div> :
       <div>
-        {ingredients && ingredients.map(ingredient => <IngredientRow ingredient={ingredient} key={ingredient.id} onUpdate={handleUpdate} onDelete={handleDelete}/>)}
-        <IngredientCreate onCreate={handleCreate}/>
+        {ingredients.map(ingredient => <IngredientRow ingredient={ingredient} key={ingredient.id} onUpdate={onUpdate} onDelete={onDelete}/>)}
+        <IngredientCreate onCreate={onCreate}/>
       </div>
     }
   </div>

@@ -1,32 +1,29 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {Button} from '../../ui/Button'
 import {Field} from '../../ui/Field'
-import {useApiFetch} from '../../hooks/api'
-import {formToJson} from '../../utils/api'
+import {formToObject} from '../../utils/api'
 
 export function IngredientRow ({ingredient, onUpdate, onDelete}) {
-
-  const {loading, errors, doFetch: fetchUpdate} = useApiFetch()
-  const {loading: loadingDelete, doFetch: fetchDelete} = useApiFetch()
-  const endpoint = `/ingredients/${ingredient.id}`
+  const [loading, setLoading] = useState(false)
+  const [errors, setErrors] = useState({})
+  const [loadingDelete, setLoadingDelete] = useState(false)
 
   const handleSubmit = async function (e) {
     e.preventDefault()
-    const newIngredient = await fetchUpdate(endpoint, {
-      method: 'put',
-      body: formToJson(e.target)
-    })
-    if (newIngredient) {
-      onUpdate(ingredient, newIngredient)
+    setErrors({})
+    setLoading(true)
+    try {
+      await onUpdate(ingredient, formToObject(e.target))
+    } catch (e) {
+      setErrors(e)
     }
+    setLoading(false)
   }
 
   const handleDelete = async function (e) {
     e.preventDefault()
-    await fetchDelete(endpoint, {
-      method: 'delete'
-    })
-    onDelete(ingredient)
+    setLoadingDelete(true)
+    await onDelete(ingredient)
   }
 
   return <form className="d-flex align-items-start" onSubmit={handleSubmit}>

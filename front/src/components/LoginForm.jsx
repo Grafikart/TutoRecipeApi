@@ -30,7 +30,7 @@ export function LoginForm ({onSuccess}) {
     setLoading(false)
   }
 
-  return <form onSubmit={handleSubmit}>
+  return <form className="container my-4" onSubmit={handleSubmit}>
     <AlertErrors errors={errors.map(e => e.message)} />
     <div className="form-group">
       <label htmlFor="email">Nom d'utilisateur</label>
