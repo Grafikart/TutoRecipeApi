@@ -1,27 +1,26 @@
-import React from 'react'
+import React, {useState} from 'react'
 import {Button} from '../../ui/Button'
 import {Field} from '../../ui/Field'
-import {useApiFetch} from '../../hooks/api'
-import {formToJson} from '../../utils/api'
+import {formToObject} from '../../utils/api'
 
 export function IngredientCreate ({onCreate}) {
 
-  const {loading, errors, doFetch: fetchCreate} = useApiFetch()
+  const [errors, setErrors] = useState({})
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async function (e) {
     e.preventDefault()
     const form = e.target
+    setLoading(true)
+    setErrors({})
     try {
-      const ingredient = await fetchCreate('/ingredients', {
-        method: 'post',
-        body: formToJson(e.target)
-      })
-      onCreate(ingredient)
-      form.reset()
-      form.querySelector('input').focus()
+      await onCreate(formToObject(e.target))
     } catch (e) {
       console.error(e)
+      setErrors(e)
     }
+    form.reset()
+    setLoading(false)
   }
 
   return <form className="d-flex align-items-start" onSubmit={handleSubmit}>

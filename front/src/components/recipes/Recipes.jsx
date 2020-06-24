@@ -1,92 +1,67 @@
 import React, {useState} from 'react'
-import {Fetch, RecipeEdit} from './RecipeForm'
+import {RecipeEdit} from './RecipeForm'
 import {Modal} from '../Modal'
+import {Loader} from '../../ui/Loader'
 
-export function Recipes () {
-  return <>
-    <Fetch endpoint="/recipes">
-      {({data: recipes}) => <RecipesList recipes={recipes}/>}
-    </Fetch>
-  </>
-}
+export function Recipes ({recipes, selectedRecipe, onClick}) {
 
-function RecipesList ({recipes}) {
+  if (recipes === null) {
+    return <Loader>Chargement des recettes...</Loader>
+  }
+
   return <div className="row">
     {recipes.map(recipe => <div className="col-md-4 mb-4" key={recipe.id}>
-      <Recipe recipe={recipe}/>
+      <Recipe recipe={recipe} onClick={onClick} selectedRecipe={selectedRecipe}/>
     </div>)}
+    {selectedRecipe && <RecipeDetail recipe={selectedRecipe} onClose={() => null} onUpdate={() => null}/>}
   </div>
 }
 
-function Recipe ({recipe: apiRecipe}) {
-
-  const [recipe, setRecipe] = useState(apiRecipe)
-  const [detailVisible, setDetailVisible] = useState(false)
-  const showDetail = function (e) {
-    e.preventDefault()
-    if (detailVisible === false) {
-      setDetailVisible(true)
-    }
-  }
-  const hideDetail = function (e = null) {
-    if (e) {
-      e.preventDefault()
-    }
-    if (detailVisible === true) {
-      setDetailVisible(false)
-    }
-  }
+function Recipe ({recipe, onClick}) {
   const htmlContent = {__html: recipe.content.split('\n').join('<br/>')}
+
+  const handleClick = function (e) {
+    e.preventDefault()
+    onClick(recipe)
+  }
 
   return <div className="card">
     <div className="card-body">
       <h5 className="card-title">{recipe.title}</h5>
       <p className="card-text" dangerouslySetInnerHTML={htmlContent}/>
-      <a href="#" className="btn btn-primary" onClick={showDetail}>Voir la recette</a>
+      <a href="#" className="btn btn-primary" onClick={handleClick}>Voir la recette</a>
     </div>
-    {detailVisible && <RecipeDetail recipe={recipe} onClose={hideDetail} onUpdate={setRecipe}/>}
   </div>
 
 }
 
-function RecipeDetail ({recipe, onClose, onUpdate}) {
-  const handleUpdate = function (recipe) {
-    onUpdate(recipe)
-    onClose()
+export function RecipeDetail ({recipe, onClose, onUpdate, onEdit, ingredients}) {
+  const [view, setView] = useState('view')
+  const handleUpdate = function (data) {
+    onUpdate(recipe, data)
+    setView('view')
   }
+
+  const toggleEdit = function () {
+    setView('edit')
+    onEdit()
+  }
+
+  const htmlContent = {__html: recipe.content.split('\n').join('<br/>')}
 
   return <Modal onClose={onClose} title={recipe.title}>
-    <Fetch endpoint={'/recipes/' + recipe.id}>
-      {({data: recipe}) => <RecipeDetailBody recipe={recipe} onUpdate={handleUpdate}/>}
-    </Fetch>
+    {view === 'view' ? <>
+        <p className="card-text" dangerouslySetInnerHTML={htmlContent}/>
+        {recipe.loading && <Loader/>}
+        {recipe.ingredients && <ul>
+          {recipe.ingredients.map(ingredient => <li key={ingredient.id}>
+            <strong>{ingredient.quantity} {ingredient.unit}</strong> {ingredient.title}
+          </li>)}
+        </ul>
+        }
+        <p className="btn btn-primary" onClick={toggleEdit}>Editer</p>
+      </> :
+      <RecipeEdit recipe={recipe} ingredients={ingredients} onSubmit={handleUpdate}/>
+    }
   </Modal>
-}
-
-function RecipeDetailBody ({recipe, onUpdate}) {
-  const [state, setState] = useState('view')
-  const htmlContent = {__html: recipe.content.split('\n').join('<br/>')}
-  const normalizedRecipe = {
-    ...recipe, ingredients: recipe.ingredients.map(i => ({
-      ingredient: i,
-      quantity: i.quantity
-    }))
-  }
-  const handleSubmit = function (recipe) {
-    onUpdate(recipe)
-    setState('view')
-  }
-
-  if (state === 'view') {
-    return <>
-      <p className="card-text" dangerouslySetInnerHTML={htmlContent}/>
-      <ul>
-        {recipe.ingredients.map(ingredient => <li key={ingredient.id}>
-          <strong>{ingredient.quantity} {ingredient.unit}</strong> {ingredient.title}
-        </li>)}
-      </ul>
-      <p className="btn btn-primary" onClick={() => setState('edit')}>Editer</p>
-    </>
-  }
-
-  return <RecipeEdit recipe={normalizedRecipe} onSubmit={handleSubmit}/>
 }

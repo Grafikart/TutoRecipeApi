@@ -13,10 +13,19 @@ export async function apiFetch (endpoint, options) {
     },
     ...options
   })
+  if (response.status === 204) {
+    return null
+  }
   const responseData = await response.json()
   if (response.ok) {
     return responseData
   } else {
+    if (Array.isArray(responseData.errors)) {
+      throw responseData.errors.reduce(function (acc, error) {
+        acc[error.field] = error.message
+        return acc
+      }, {})
+    }
     throw responseData
   }
 }
@@ -26,5 +35,9 @@ export async function apiFetch (endpoint, options) {
  * @return {string}
  */
 export function formToJson(element) {
-  return JSON.stringify(Object.fromEntries(new FormData(element)))
+  return JSON.stringify(formToObject(element))
+}
+
+export function formToObject(element) {
+  return Object.fromEntries(new FormData(element))
 }
