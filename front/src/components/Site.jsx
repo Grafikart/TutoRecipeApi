@@ -1,17 +1,36 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {NavBar} from './NavBar'
 import {Ingredients} from './Ingredients'
-import {Recipes} from './recipes/Recipes'
+import {RecipeDetail, Recipes} from './recipes/Recipes'
 import {RecipeCreate} from './recipes/RecipeForm'
+import {useRecipes, useSite} from '../hooks/site'
 
-export function Site () {
+export const Site = function () {
   const [page, setPage] = useState('recipes')
+  const {
+    recipes,
+    selectedRecipe,
+    fetchRecipes,
+    fetchRecipe,
+    unselectRecipe,
+  } = useRecipes()
+
+  let content = []
+  if (page === 'recipes') {
+    content.push(<Recipes key="recipes" recipes={recipes} selectedRecipe={selectedRecipe} onClick={fetchRecipe} onModalClose={unselectRecipe}/>)
+    if (selectedRecipe) {
+      content.push(<RecipeDetail key={'recipe' + selectedRecipe.id} recipe={selectedRecipe} onClose={unselectRecipe}/> )
+    }
+  }
+
+  // Au chargement
+  useEffect(() => {
+      fetchRecipes()
+  }, [])
 
   return <>
       <NavBar page={page} onPageChange={setPage} title="Recettes" />
-      <div className="container">
-        <Content page={page} setPage={setPage}/>
-      </div>
+      <div className="container">{content}</div>
     </>
 }
 
