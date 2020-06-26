@@ -7,7 +7,7 @@ import RecipeValidator from "App/Validators/RecipeValidator";
 export default class RecipesController {
 
     public async index () {
-        return await Recipe.all()
+        return await Recipe.query().select(['id', 'title', 'short'])
     }
 
     public async read ({params}: HttpContextContract) {

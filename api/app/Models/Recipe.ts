@@ -10,6 +10,9 @@ export default class Recipe extends BaseModel {
   public title: string
 
   @column()
+  public short: string
+
+  @column()
   public content: string
 
   @column.dateTime({ autoCreate: true })

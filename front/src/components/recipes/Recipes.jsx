@@ -18,8 +18,6 @@ export function Recipes ({recipes, selectedRecipe, onClick}) {
 }
 
 function Recipe ({recipe, onClick}) {
-  const htmlContent = {__html: recipe.content.split('\n').join('<br/>')}
-
   const handleClick = function (e) {
     e.preventDefault()
     onClick(recipe)
@@ -28,7 +26,7 @@ function Recipe ({recipe, onClick}) {
   return <div className="card">
     <div className="card-body">
       <h5 className="card-title">{recipe.title}</h5>
-      <p className="card-text" dangerouslySetInnerHTML={htmlContent}/>
+      <p className="card-text">{recipe.short}</p>
       <a href="#" className="btn btn-primary" onClick={handleClick}>Voir la recette</a>
     </div>
   </div>
@@ -47,7 +45,7 @@ export function RecipeDetail ({recipe, onClose, onUpdate, onEdit, ingredients}) 
     onEdit()
   }
 
-  const htmlContent = {__html: recipe.content.split('\n').join('<br/>')}
+  const htmlContent = {__html: (recipe.content || '').split('\n').join('<br/>')}
 
   return <Modal onClose={onClose} title={recipe.title}>
     {view === 'view' ? <>
