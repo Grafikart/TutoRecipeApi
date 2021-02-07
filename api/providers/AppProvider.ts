@@ -1,24 +1,23 @@
-import { IocContract } from '@adonisjs/fold'
+import { ApplicationContract } from '@ioc:Adonis/Core/Application'
 
 export default class AppProvider {
-  constructor (protected $container: IocContract) {
-  }
+  public static needsApplication = true
 
-  public register () {
+  constructor(protected app: ApplicationContract) {}
+
+  public register() {
     // Register your own bindings
   }
 
-  public boot () {
+  public async boot() {
     // IoC container is ready
   }
 
-  public shutdown () {
-    // Cleanup, since app is going down
+  public async ready() {
+    // App is ready
   }
 
-  public async ready () {
-    const Database = (await import('@ioc:Adonis/Lucid/Database')).default
-    const Event = (await import('@ioc:Adonis/Core/Event')).default
-    Event.on('db:query', Database.prettyPrint)
+  public async shutdown() {
+    // Cleanup, since app is going down
   }
 }
