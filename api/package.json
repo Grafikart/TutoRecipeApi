@@ -23,6 +23,7 @@
     "youch-terminal": "^1.0.1"
   },
   "dependencies": {
+    "@adonisjs/auth": "^5.1.1",
     "@adonisjs/core": "^5.0.4-preview-rc-2.1",
     "@adonisjs/repl": "^1.1.6",
     "proxy-addr": "^2.0.6",
