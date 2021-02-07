@@ -1,12 +1,14 @@
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.get('/', async () => {
-  return { hello: 'world' }
-})
-
-Route.post('/login', 'AuthController.login')
+Route.post('login', 'AuthController.login')
 
 Route.group(() => {
   // Profil
-  Route.get('/me', 'AuthController.me')
+  Route.get('me', 'AuthController.me')
+
+  // Ingrédients
+  Route.get('ingredients', 'IngredientsController.index')
+  Route.post('ingredients', 'IngredientsController.store')
+  Route.put('ingredients/:id', 'IngredientsController.update')
+  Route.delete('ingredients/:id', 'IngredientsController.delete')
 }).middleware(['auth'])
