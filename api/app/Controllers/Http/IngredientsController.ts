@@ -1,5 +1,4 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-
 import Ingredient from 'App/Models/Ingredient'
 import IngredientValidator from 'App/Validators/IngredientValidator'
 
@@ -8,10 +7,15 @@ export default class IngredientsController {
     return Ingredient.all()
   }
 
-  public async store({ request }: HttpContextContract) {
-    const payload = await request.validate(IngredientValidator)
+  public show({ params }: HttpContextContract) {
+    return Ingredient.findOrFail(params.id)
+  }
 
-    return Ingredient.create(payload)
+  public async store({ request, response }: HttpContextContract) {
+    const payload = await request.validate(IngredientValidator)
+    const ingredient = await Ingredient.create(payload)
+
+    return response.created(ingredient)
   }
 
   public async update({ request, params }: HttpContextContract) {
@@ -21,7 +25,7 @@ export default class IngredientsController {
     return ingredient.merge(payload).save()
   }
 
-  public async delete({ params }: HttpContextContract) {
+  public async destroy({ params, response }: HttpContextContract) {
     const ingredient = await Ingredient.query()
       .doesntHave('recipes')
       .where('id', params.id)
@@ -29,6 +33,6 @@ export default class IngredientsController {
 
     await ingredient.delete()
 
-    return null
+    return response.noContent()
   }
 }

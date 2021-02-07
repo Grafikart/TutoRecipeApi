@@ -7,8 +7,5 @@ Route.group(() => {
   Route.get('me', 'AuthController.me')
 
   // Ingrédients
-  Route.get('ingredients', 'IngredientsController.index')
-  Route.post('ingredients', 'IngredientsController.store')
-  Route.put('ingredients/:id', 'IngredientsController.update')
-  Route.delete('ingredients/:id', 'IngredientsController.delete')
+  Route.resource('ingredients', 'IngredientsController').apiOnly()
 }).middleware(['auth'])
