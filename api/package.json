@@ -29,6 +29,7 @@
     "@adonisjs/repl": "^1.1.6",
     "@adonisjs/session": "^4.0.6",
     "luxon": "^1.25.0",
+    "phc-argon2": "^1.0.11",
     "proxy-addr": "^2.0.6",
     "reflect-metadata": "^0.1.13",
     "source-map-support": "^0.5.19",
