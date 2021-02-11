@@ -16,7 +16,7 @@ export default class Recipe extends BaseModel {
   public title: string
 
   @column()
-  public content?: string
+  public content: string
 
   @column()
   public short?: string

@@ -12,7 +12,7 @@ export default class Ingredients extends BaseSchema {
     this.schema.createTable('recipes', (table) => {
       table.increments('id')
       table.string('title').notNullable().unique()
-      table.text('content')
+      table.text('content').notNullable()
       table.text('short')
       table.timestamps(true)
     })
