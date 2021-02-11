@@ -22,6 +22,7 @@ const corsConfig: CorsConfig = {
   */
   enabled: true,
 
+  // You can also use a function that return true or false.
   // enabled: (request) => request.url().startsWith('/api')
 
   /*
@@ -36,10 +37,10 @@ const corsConfig: CorsConfig = {
   |
   | Boolean (true)    - Allow current request origin.
   | Boolean (false)   - Disallow all.
-  | String            - Comma seperated list of allowed origins.
+  | String            - Comma separated list of allowed origins.
   | Array             - An array of allowed origins.
   | String (*)        - A wildcard (*) to allow all request origins.
-  | Function          - Receives the current origin stirng and should return
+  | Function          - Receives the current origin string and should return
   |                     one of the above values.
   |
   */
@@ -69,7 +70,7 @@ const corsConfig: CorsConfig = {
   |
   | Boolean(true)     - Allow all headers mentioned in `Access-Control-Request-Headers`.
   | Boolean(false)    - Disallow all headers.
-  | String            - Comma seperated list of allowed headers.
+  | String            - Comma separated list of allowed headers.
   | Array             - An array of allowed headers.
   | Function          - Receives the current header and should return one of the above values.
   |

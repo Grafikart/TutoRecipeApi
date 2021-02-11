@@ -1,4 +1,4 @@
-export function wait (duration: number): Promise<void> {
+export function wait(duration: number): Promise<void> {
   return new Promise<void>(function (resolve) {
     setTimeout(function () {
       resolve()

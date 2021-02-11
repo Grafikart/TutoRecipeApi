@@ -50,7 +50,7 @@ declare module '@ioc:Adonis/Addons/Auth' {
   | - SessionGuardContract
   | - BasicAuthGuardContract
   | - JwtGuardContract
-  | - ApiTokensGuardContract
+  | - OATGuardContract ( Opaque access token )
   |
   | Every guard needs a provider for looking up users from the database.
   |

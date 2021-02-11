@@ -3,13 +3,15 @@
   "commands": [
     "./commands",
     "@adonisjs/core/build/commands",
+    "@adonisjs/repl/build/commands",
     "@adonisjs/lucid/build/commands"
   ],
   "exceptionHandlerNamespace": "App/Exceptions/Handler",
   "aliases": {
     "App": "app",
-    "Contracts": "contracts",
-    "Config": "config"
+    "Config": "config",
+    "Database": "database",
+    "Contracts": "contracts"
   },
   "preloads": [
     "./start/routes",
@@ -18,12 +20,11 @@
   "providers": [
     "./providers/AppProvider",
     "@adonisjs/core",
-    "@adonisjs/lucid",
     "@adonisjs/auth",
+    "@adonisjs/lucid",
     "@adonisjs/session"
   ],
-  "metaFiles": [
-    ".env",
-    ".adonisrc.json"
+  "aceProviders": [
+    "@adonisjs/repl"
   ]
 }

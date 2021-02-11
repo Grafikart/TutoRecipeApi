@@ -1,29 +1,38 @@
 {
-  "name": "AdonisApi",
-  "version": "0.0.0",
+  "name": "api",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "node ace build",
-    "start": "node ace serve --watch"
+    "build": "node ace build --production",
+    "start": "node server.js",
+    "dev": "node ace serve --watch",
+    "lint": "eslint . --ext=.ts",
+    "format": "prettier --write ."
   },
   "devDependencies": {
-    "@adonisjs/assembler": "^2.1.2",
-    "adonis-preset-ts": "^1.0.4",
-    "pino-pretty": "^4.0.0",
-    "typescript": "^3.9.5",
-    "youch": "^2.0.10",
-    "youch-terminal": "^1.0.0"
+    "@adonisjs/assembler": "^3.1.1",
+    "adonis-preset-ts": "^2.0.0",
+    "eslint": "^7.19.0",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-adonis": "^1.2.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "pino-pretty": "^4.5.0",
+    "prettier": "^2.2.1",
+    "typescript": "^4.1.5",
+    "youch": "^2.1.1",
+    "youch-terminal": "^1.0.1"
   },
   "dependencies": {
-    "@adonisjs/ace": "^6.9.3",
-    "@adonisjs/auth": "^4.1.5",
-    "@adonisjs/core": "^5.0.0-preview-rc-1.6",
-    "@adonisjs/fold": "^6.3.5",
-    "@adonisjs/lucid": "^8.1.1",
-    "@adonisjs/session": "^3.0.3",
+    "@adonisjs/auth": "^5.1.1",
+    "@adonisjs/core": "^5.0.4-preview-rc-2.1",
+    "@adonisjs/lucid": "^10.0.0",
+    "@adonisjs/repl": "^1.1.6",
+    "@adonisjs/session": "^4.0.6",
+    "luxon": "^1.25.0",
+    "phc-argon2": "^1.1.0",
     "proxy-addr": "^2.0.6",
     "reflect-metadata": "^0.1.13",
     "source-map-support": "^0.5.19",
-    "sqlite3": "^4.2.0"
+    "sqlite3": "^5.0.1"
   }
 }

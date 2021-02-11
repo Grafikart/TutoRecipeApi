@@ -1,39 +1,38 @@
-import Ingredient from "App/Models/Ingredient";
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import IngredientValidator from "App/Validators/IngredientValidator";
+import Ingredient from 'App/Models/Ingredient'
+import IngredientValidator from 'App/Validators/IngredientValidator'
 
 export default class IngredientsController {
+  public index() {
+    return Ingredient.all()
+  }
 
-    async index () {
-        return Ingredient.all()
-    }
+  public show({ params }: HttpContextContract) {
+    return Ingredient.findOrFail(params.id)
+  }
 
-    async read ({params}: HttpContextContract) {
-        return Ingredient.findOrFail(params.id)
-    }
+  public async store({ request, response }: HttpContextContract) {
+    const payload = await request.validate(IngredientValidator)
+    const ingredient = await Ingredient.create(payload)
 
-    async store ({request}: HttpContextContract) {
-        const data = await request.validate(IngredientValidator)
-        return await Ingredient.create(data)
-    }
+    return response.created(ingredient)
+  }
 
-    async update ({request, params}: HttpContextContract) {
-        const data = await request.validate(IngredientValidator)
-        const ingredient = await Ingredient.findOrFail(params.id)
-        ingredient.merge(data)
-        await ingredient.save()
-        return ingredient
-    }
+  public async update({ request, params }: HttpContextContract) {
+    const payload = await request.validate(IngredientValidator)
+    const ingredient = await Ingredient.findOrFail(params.id)
 
-    async delete ({params}: HttpContextContract) {
-        const ingredient = await Ingredient.findOrFail(params.id)
-        const recipe = await ingredient.related('recipes').query().first()
-        if (recipe) {
-            throw new Error(`Cet ingrédient est utilisé pour la recette '${recipe.title}'`);
-        }
-        await ingredient.related('recipes').detach()
-        await ingredient.delete()
-        return null
-    }
+    return ingredient.merge(payload).save()
+  }
 
+  public async destroy({ params, response }: HttpContextContract) {
+    const ingredient = await Ingredient.query()
+      .doesntHave('recipes')
+      .where('id', params.id)
+      .firstOrFail()
+
+    await ingredient.delete()
+
+    return response.noContent()
+  }
 }
