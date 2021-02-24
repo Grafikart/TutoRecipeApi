@@ -33,6 +33,7 @@ export default class RecipeValidator {
         whereNot: this.ctx.params.id ? { id: this.ctx.params.id } : undefined,
       }),
     ]),
+    short: schema.string.optional(),
     content: schema.string(),
     ingredients: schema.array().members(
       schema.object().members({
